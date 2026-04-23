@@ -7,7 +7,7 @@ The goal is to classify embryo development into **16 ordered phases** using **sh
 - An **LSTM** over frame features
 - A **classification head** that predicts the phase label
 
-It is designed to be practical on local hardware by using **staged training** (≈8% of videos per stage) and an optional **step cap** (≈3000 steps/epoch).
+It is designed to be practical on local hardware by using **staged training** (≈8% of videos per stage) and an optional **step cap** (≈3000 steps/epoch). The totl 21hrs of training
 
 ---
 
