@@ -237,96 +237,8 @@ Practical takeaway:
 
 ---
 
-## 6) How to run (VS Code / Jupyter)
 
-1) Open `lstm-on-embryo-dataset.ipynb`
-2) Run cells in order (top to bottom)
-3) The main training cell will:
-   - Create the split
-   - Create stage video lists
-   - Run stage 01 → stage 02 → … sequentially
-   - Save checkpoints after every epoch
-   - After all stages, evaluate the **global best** on val + test
-4) Run the plotting cell to see curves
-
-If you interrupt training:
-- Re-run the training cell
-- It will resume from `outputs_lstm/latest_checkpoint_stageXX.pth` if it exists
-
-### Fast final submission run (5-10 min target)
-Use the last evaluation cell (Cell 7) with these defaults:
-- `FAST_SUBMISSION_MODE = True`
-- `MAX_TEST_SAMPLES = 4000`
-- `RUN_VAL_EVAL = False`
-
-This runs a fast test-only evaluation and writes `outputs_lstm/final_metrics.json`.
-
-If you have extra time and want full test-set metrics:
-- set `FAST_SUBMISSION_MODE = False`
-- re-run Cell 7
-
-Expected output line:
-
-```text
-FINAL TEST | total ... | ce ... | ord ... | exact XX.XX% | tol(±1) YY.YY%
-```
-
----
-
-## 7) Common issues + quick fixes
-
-### “Train dataset has 0 samples”
-Likely causes:
-- Annotation CSV missing: `embryo_dataset_annotations/<VIDEO_ID>_phases.csv`
-- Frames missing: `embryo_dataset/<VIDEO_ID>/...`
-- Frame naming mismatch (must contain `_RUN<number>`)
-- RUN ranges in CSV don’t match the available RUN indices in filenames
-
-### Very high steps/epoch
-If you see huge `steps/epoch`, confirm:
-- `LIMIT_TRAIN_STEPS = True`
-- `TARGET_TRAIN_STEPS = 3000`
-
-Also note:
-- If the stage dataset is smaller than `TARGET_TRAIN_STEPS * BATCH_SIZE`, then it will use the full stage dataset (steps/epoch will be lower).
-
-### GPU out of memory
-Try in the training config:
-- Lower `BATCH_SIZE` (e.g., 8 → 4)
-- Lower `IMAGE_SIZE` (e.g., 224 → 160)
-- Lower `SEQ_LEN` (e.g., 5 → 3)
-
----
-
-## 8) Key knobs (recommended defaults)
-
-- Stage chunking:
-  - `STAGE_TOTAL_VIDEO_FRACTION = 0.08`
-- Runtime control:
-  - `LIMIT_TRAIN_STEPS = True`
-  - `TARGET_TRAIN_STEPS = 3000`
-- Sequence:
-  - `SEQ_LEN = 5`
-- Optimization:
-  - `LR = 5e-4`
-  - `ReduceLROnPlateau` scheduler
-  - Grad clipping: `clip_grad_norm_(..., 1.0)`
-
----
-
-## 9) What “success” looks like
-
-You should end up with:
-- Many stage checkpoints: `outputs_lstm/latest_checkpoint_stage01.pth`, `...stage02.pth`, …
-- A global best weights file: `outputs_lstm/best_cnn_lstm.pth`
-- A final printout:
-  - `FINAL (best weights) | Val ...`
-  - `FINAL (best weights) | Test ...`
-- Plot curves that reflect training across *all* stages.
-
----
-
-## 10) Latest fast submission result
+## 6) Latest fast submission result
 
 Using the final evaluation cell in fast mode:
 - `FAST_SUBMISSION_MODE=True`
@@ -347,10 +259,4 @@ Saved output file:
 
 Note:
 - This is a **fast approximate** submission metric (deterministic capped subset).
-- For full test-set metrics, set `FAST_SUBMISSION_MODE=False` and run the same final evaluation cell again.
 
-For submission, report from `outputs_lstm/final_metrics.json`:
-- Final Test Exact Accuracy: `test.exact_acc`
-- Final Test Tolerance Accuracy (±1): `test.tol_acc_pm1`
-
-If `is_approx_eval=true`, mention that results were produced in fast mode on a deterministic capped test subset (`test_samples_used/test_samples_total`).
